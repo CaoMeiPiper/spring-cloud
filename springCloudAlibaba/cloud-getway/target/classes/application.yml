@@ -1,0 +1,33 @@
+server:
+  port: 7789
+spring:
+  application:
+    name: gateway
+  cloud:
+    nacos:
+      config:
+        server-addr: localhost:8848
+      discovery:
+        service-name: ${spring.application.name}
+    gateway:
+      routes:
+        - id: user-route  #指定唯一标识
+        #          uri: http://localhost:6666/ #指定路由服务的地址
+          uri: lb://clouduser   #服务名，实现负载均衡
+          predicates:
+            - Path=/user/** #指定路由规则
+
+        - id: product-route  #指定唯一标识
+          #          uri: http://localhost:6667/ #指定路由服务的地址
+          uri: lb://cloudproduct   # lb：服务名，实现负载均衡
+          predicates:
+            - Path=/product/** #指定路由规则
+      discovery:
+        locator:
+          enabled: true  #开启动态服务名动态获取路由地址
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"   #暴露路由的规则端点  /actuator/gateway/routes
